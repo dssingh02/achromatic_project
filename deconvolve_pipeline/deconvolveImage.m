@@ -10,7 +10,7 @@ function [sharpImg] = deconvolveImage(blurryImg, optRadius, kernelSize, resizeFa
 %    kernelSize - Kernel size
 %    resizeFactor - Upscale resize factor during deblurring
 %    optIteration - Number of iterations for deconvolving; 0 if no
-%    deblurring is necessary
+%       deblurring is necessary
 %
 % Outputs:
 %    sharpImg - The deconvolved image

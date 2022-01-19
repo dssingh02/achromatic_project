@@ -16,28 +16,28 @@ function [kernel] = circularBlurKernel(kernelSize, radius)
 % Website: http://www.dave-singh.me
 % Last revision: 19-January-2022
 
-    RESOLUTION = 100;
+RESOLUTION = 100;
 
-    kernel = zeros(kernelSize, kernelSize);
+kernel = zeros(kernelSize, kernelSize);
+
+x = -kernelSize/2 + 0.5:kernelSize/2 - 0.5;
+[X,Y] = meshgrid(x,x);
+
+for i = 1:size(X(:),1)
+    cx = linspace(X(i) - 0.5, X(i) + 0.5, RESOLUTION);
+    cy = linspace(Y(i) - 0.5, Y(i) + 0.5, RESOLUTION);
     
-    x = -kernelSize/2 + 0.5:kernelSize/2 - 0.5;
-    [X,Y] = meshgrid(x,x);
+    [CX,CY] = meshgrid(cx,cy);
+    total = 0;
     
-    for i = 1:size(X(:),1)
-        cx = linspace(X(i) - 0.5, X(i) + 0.5, RESOLUTION);
-        cy = linspace(Y(i) - 0.5, Y(i) + 0.5, RESOLUTION);
-        
-        [CX,CY] = meshgrid(cx,cy);
-        total = 0;
-        
-        for j = 1:size(CX(:))
-            if (CX(j)^2 + CY(j)^2 < radius^2)
-                total = total + 1;
-            end
+    for j = 1:size(CX(:))
+        if (CX(j)^2 + CY(j)^2 < radius^2)
+            total = total + 1;
         end
-        
-        kernel(i) = total / RESOLUTION^2;
     end
     
-    kernel = kernel / sum(kernel(:));
+    kernel(i) = total / RESOLUTION^2;
+end
+
+kernel = kernel / sum(kernel(:));
 end
