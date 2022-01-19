@@ -1,7 +1,7 @@
 function [sharpImg] = deconvolveImageTiled(blurryImg, optRadius, kernelSize, resizeFactor, optIteration, tileSize, dispFig)
 % Deconvolve achromatic image by splitting it up into an nxn grid of images
 %
-% Syntax: [sharpImg] = deconvolveImageTiled(blurryImg, optRadius, kernelSize, resizeFactor, optIteration, tileSize)
+% Syntax: [sharpImg] = deconvolveImageTiled(blurryImg, optRadius, kernelSize, resizeFactor, optIteration, tileSize, dispFig)
 %
 % Inputs:
 %    blurryImg - Image to deconvolve
@@ -36,12 +36,14 @@ tileHeight = floor(size(blurryImg,1)/tileSize);
 sharpImg = blurryImg;
 sharpImg(:) = 0;
 
+tileMargin = kernelSize;
+
 for row = 1:tileSize
     for col = 1:tileSize
-        startRow = max(1,(row-1)*tileHeight+1-margin);
-        startCol = max(1,(col-1)*tileWidth+1-margin);
-        endRow = min(size(blurryImg,1),row*tileHeight+margin);
-        endCol = min(size(blurryImg,2),col*tileWidth+margin);
+        startRow = max(1,(row-1)*tileHeight+1-tileMargin);
+        startCol = max(1,(col-1)*tileWidth+1-tileMargin);
+        endRow = min(size(blurryImg,1),row*tileHeight+tileMargin);
+        endCol = min(size(blurryImg,2),col*tileWidth+tileMargin);
         
         if (row == tileSize)
             endRow = size(blurryImg,1);
@@ -55,15 +57,15 @@ for row = 1:tileSize
         cTile = deconvolveImage(cTile, optRadius, kernelSize, resizeFactor, optIteration);
         
         % Reconstruct full image
-        deconvStartRow = startRow + margin;
-        deconvStartCol = startCol + margin;
-        deconvEndRow = endRow - margin;
-        deconvEndCol = endCol - margin;
+        deconvStartRow = startRow + tileMargin;
+        deconvStartCol = startCol + tileMargin;
+        deconvEndRow = endRow - tileMargin;
+        deconvEndCol = endCol - tileMargin;
         
-        tileStartRow = margin + 1;
-        tileStartCol = margin + 1;
-        tileEndRow = size(cTile,1)-margin;
-        tileEndCol = size(cTile,2)-margin;
+        tileStartRow = tileMargin + 1;
+        tileStartCol = tileMargin + 1;
+        tileEndRow = size(cTile,1)-tileMargin;
+        tileEndCol = size(cTile,2)-tileMargin;
         
         if (row == 1)
             deconvStartRow = 1;
