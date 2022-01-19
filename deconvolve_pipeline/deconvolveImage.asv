@@ -19,12 +19,12 @@ function [sharpImg] = deconvolveImage(blurryImg, optRadius, kernelSize, resizeFa
 %    [kernel] = circularBlurKernel(kernelSize, radius)
 %
 % Author: Devdigvijay Singh, Princeton University
-% Email: dssingh@princeton.edu
+% email: dssingh@princeton.edu
 % Website: http://www.dave-singh.me
-% Last revision: 19-January-2022
+% Last revision: 18-January-2022
 
 % Generate circular blur kernel.
-[kernel] = circularBlurKernel(kernelSize, optRadius);
+[kernel] = circularBlurKernel(kernelSize, radius)
 
 if (optIteration > 0)
     % Upscale blurry image.
@@ -32,12 +32,12 @@ if (optIteration > 0)
     clear blurryImg;
     
     % Deconvolve upscaled image.
-    deconvImg = deconvlucy(upscaleImg, kernel, optIteration);
-    clear upscaleImg;
+    deconvTile = deconvlucy(upscaleImg, kernel, iterNums(wavelengthIndex));
+    clear upscaleTile;
     
     % Downscale deconvolved image.
-    sharpImg = imresize(deconvImg, 1/resizeFactor, 'box');
-    clear deconvImg;
+    sharpImg = imresize(deconvTile, 1/RESIZE_FACTOR, 'box');
+    clear deconvTile;
 else
     sharpImg = blurryImg;
 end
