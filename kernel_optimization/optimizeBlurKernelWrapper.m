@@ -39,8 +39,25 @@ tic;
 [blurryImgs, focusImgs] = correctGeometricDistortion(blurryImgs, xShift, yShift, focusImgs);
 toc
 
+%%
 
+% Convert images to grayscale
+if isa(focusImgs,'uint16')
+    blurryImgs = double(blurryImgs)/(2^16-1);
+    focusImgs = double(focusImgs)/(2^16-1);
+else
+    blurryImgs = double(blurryImgs)/(2^8-1);
+    focusImgs = double(focusImgs)/(2^8-1);
+end
 
+% Estimate noise with a denoising neural network
+net = denoisingNetwork('DnCNN');
+[noise_var] = estimateNoise(imgs, net);
 
+%%
+[optimalRadii, optimizationData] = optimizeKernelRadius(focusImgs, blurryImgs,...
+    noise_var, KERNEL_SIZE, MIN_KERNEL_RADIUS, MAX_KERNEL_RADIUS, ...
+    KERNEL_RADIUS_INCREMENT, RESIZE_FACTOR, true);
 
+save('data_files\optimized_paramsV2','optimalRadii','optimizationData');
 
