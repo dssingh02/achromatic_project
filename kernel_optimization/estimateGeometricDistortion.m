@@ -66,13 +66,6 @@ for idx1 = 1:size(imgSet1,3)
             centroidShift(k,:) = closest - imgCentersSet1{idx1}(k,:);
         end
         
-        figure(2)
-        clf;
-        subplot(1,2,1)
-        histogram(centroidShift(:,1))
-        subplot(1,2,2)
-        histogram(centroidShift(:,2))
-        
         % Filter out deviations.
         shiftMagnitude = sqrt(sum([centroidShift.^2]'))';
         sel = abs((shiftMagnitude - mean(shiftMagnitude))/std(shiftMagnitude)) > stdDevThreshold;
