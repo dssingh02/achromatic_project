@@ -2,12 +2,12 @@ function [normalizedImage, normalizedImage2] = normalizeBWImage(img, threshold, 
 % Normalize BW image - Linearly stretches the histogram of a grayscale image
 % with black and white elements to specified peaks for black and white.
 %
-% Syntax:  [normalizedImage] = normalizeBWImage(img, threshold, blackPk, whitePk)
+% Syntax:  [normalizedImage] = normalizeBWImage(img, threshold, blackPk, whitePk, bitCount)
 %
 % Inputs:
 %    img - Image to normalize
 %    threshold - A grayscale threshold value guaranteed to divide black and
-%    white
+%       white
 %    darkPk - The desired value of the dark peak in the histogram.
 %    brightPk - The desired value of the bright peak in the histogram.
 %    bitCount - 8 if 8-bit, 16 if 16-bit.
