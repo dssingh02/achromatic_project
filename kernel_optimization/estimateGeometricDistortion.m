@@ -8,7 +8,7 @@ function [xShift,yShift] = estimateGeometricDistortion(imgSet1, imgSet2, minCirc
 %
 % Inputs:
 %    imgSet1 - First image set (matrix of size h x w x n)
-%    imgSet2 - Second image set (matrix of size h x w x m)
+%    imgSet2 - Second image set (matrix of size h x w x n x m)
 %    minCircleRadius - Minimum radius of calibration circles
 %    maxCircleRadius - Maximum radius of calibration circles
 %    sensitivity - Sensitivity to find circles in (see imfindcircles(...))
@@ -28,39 +28,44 @@ if ~exist('stdDevThreshold','var')
     stdDevThreshold = 3;
 end
 
+num_focus_imgs = size(imgSet2,3);
+num_blurry_imgs = size(imgSet2,4);
+
 % Initialize shift matrices.
-xShift = NaN(size(imgSet1,3), size(imgSet2,3));
-yShift = NaN(size(imgSet1,3), size(imgSet2,3));
+xShift = NaN(num_focus_imgs, num_blurry_imgs);
+yShift = NaN(num_focus_imgs, num_blurry_imgs);
 
 % Find and store all circle positions in all images.
-imgCentersSet1 = cell(size(imgSet1,3),1);
-imgCentersSet2 = cell(size(imgSet1,3),1);
+imgCentersSet1 = cell(num_focus_imgs,1);
+imgCentersSet2 = cell(num_focus_imgs,num_blurry_imgs);
 
-for idx1 = 1:size(imgSet1,3)
+for idx1 = 1:num_focus_imgs
     [imgCentersSet1{idx1},~] = imfindcircles(imgSet1(:,:,idx1), ...
         [minCircleRadius maxCircleRadius], 'ObjectPolarity','dark', ...
         'Sensitivity',sensitivity);
 end
 
-for idx2 = 1:size(imgSet2,3)
-    [imgCentersSet2{idx2},~] = imfindcircles(imgSet2(:,:,idx2), ...
-        [minCircleRadius maxCircleRadius], 'ObjectPolarity','dark', ...
-        'Sensitivity',sensitivity);
+for idx1 = 1:num_focus_imgs
+    for idx2 = 1:num_blurry_imgs
+        [imgCentersSet2{idx1,idx2},~] = imfindcircles(imgSet2(:,:,idx1,idx2), ...
+            [minCircleRadius maxCircleRadius], 'ObjectPolarity','dark', ...
+            'Sensitivity',sensitivity);
+    end
 end
 
 % Process circle center positions to determine geometric distortion.
-for idx1 = 1:size(imgSet1,3)
-    for idx2 = 1:size(imgSet2,3)
+for idx1 = 1:num_focus_imgs
+    for idx2 = 1:num_blurry_imgs
         centroidShift = zeros(size(imgCentersSet1{idx1},1),2);
         
         for k = 1:size(imgCentersSet1{idx1},1)
             % Compute Euclidean distances.
-            centerDiff = imgCentersSet2{idx2} - imgCentersSet1{idx1}(k,:);
+            centerDiff = imgCentersSet2{idx1,idx2} - imgCentersSet1{idx1}(k,:);
             distances = sqrt(sum([centerDiff.^2]'))';
             
             % Find the circle in set 2 that is closest to the current
             % circle in set 1.
-            closest = imgCentersSet2{idx2}(distances==min(distances),:);
+            closest = imgCentersSet2{idx1,idx2}(distances==min(distances),:);
             
             % Calculate the centroid shift.
             centroidShift(k,:) = closest - imgCentersSet1{idx1}(k,:);

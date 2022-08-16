@@ -1,7 +1,7 @@
 function [correctedImgSet2,correctedImgSet1] = correctGeometricDistortion(imgSet2, xShift, yShift, imgSet1)
 % This function corrects a constant geometric translation between images.
 %
-% Syntax:  [correctedImgs] = correctGeometricDistortion(imgSet1, imgSet2, xShift, yShift)
+% Syntax:  [correctedImgSet2,correctedImgSet1] = correctGeometricDistortion(imgSet2, xShift, yShift, imgSet1)
 %
 % Inputs:
 %    imgSet2 - The set of images to correct (matrix of size l x w x n)

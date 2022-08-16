@@ -5,6 +5,8 @@ load data_files\optimization_params.mat;
 FOLDER_NAME = "D:\mansouri_image_set\";
 IMG_WAVELENGTHS = ["470","530","590","625","730","850","940"];
 
+FOCUS_IDX = [2];
+
 % Read one image and calculate crop parameters.
 img = imread(sprintf('%s%s_%s.tif',FOLDER_NAME,IMG_WAVELENGTHS(1),IMG_WAVELENGTHS(1)));
 cropParams = [size(img,2)*CROP_RATIO/2, size(img,1)*CROP_RATIO/2, size(img,2)*CROP_RATIO, size(img,1)*CROP_RATIO];
@@ -29,11 +31,16 @@ for focusIdx = 1:length(IMG_WAVELENGTHS)
     end
 end
 
+
+%%
+focusImgs = focusImgs(:,:,FOCUS_IDX);
+blurryImgs = blurryImgs(:,:,FOCUS_IDX,:);
+%%
 % Estimate geometric distortions.
 tic;
 [xShift,yShift] = estimateGeometricDistortion(focusImgs, blurryImgs, MIN_CIRCLE_RADIUS, MAX_CIRCLE_RADIUS, SENSITIVITY);
 toc
-
+%%
 % Correct geometric distortions.
 tic;
 [blurryImgs, focusImgs] = correctGeometricDistortion(blurryImgs, xShift, yShift, focusImgs);
@@ -50,14 +57,20 @@ else
     focusImgs = double(focusImgs)/(2^8-1);
 end
 
+%%
 % Estimate noise with a denoising neural network
+% noise_var = zeros(size(blurryImgs,3), size(blurryImgs,4));
+tic;
 net = denoisingNetwork('DnCNN');
-[noise_var] = estimateNoise(imgs, net);
+[noise_var] = estimateNoise(blurryImgs, net);
+toc
 
 %%
+tic
 [optimalRadii, optimizationData] = optimizeKernelRadius(focusImgs, blurryImgs,...
     noise_var, KERNEL_SIZE, MIN_KERNEL_RADIUS, MAX_KERNEL_RADIUS, ...
-    KERNEL_RADIUS_INCREMENT, RESIZE_FACTOR, true);
+    KERNEL_RADIUS_INCREMENT, RESIZE_FACTOR, false);
+toc
 
-save('data_files\optimized_paramsV2','optimalRadii','optimizationData');
+save('data_files\optimized_paramsV4WithNoise','optimalRadii','optimizationData','noise_var');
 

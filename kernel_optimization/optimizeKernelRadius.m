@@ -118,12 +118,14 @@ for idx1 = 1:size(focusImgs,3)
                 plot([tempMaxRadius,tempMaxRadius],yl,'k');
                 hold off;
                 drawnow;
-                
-                fprintf('focus img: %i\tblurry img: %i\titeration: %i\ttime elapsed: %.2fs\n',idx1, idx2, iter, tElapsed);
             end
+            fprintf('focus img: %i\tblurry img: %i\titeration: %i\ttime elapsed: %.2fs\n',idx1, idx2, iter, tElapsed);
+            
         end
+        temp_mins = radiusSeries(MSESeries == min(MSESeries));
+        optimalRadii(idx1,idx2) = temp_mins(1);
         
-        optimalRadii(idx1,idx2) = radiusSeries(MSESeries == min(MSESeries));
+        fprintf('optimal radius: %.2f\n', optimalRadii(idx1, idx2));
         
         optimizationData.radius{idx1,idx2} = radiusSeries;
         optimizationData.MSE{idx1,idx2} = MSESeries;
