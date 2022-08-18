@@ -2,12 +2,12 @@ clear;
 
 % Load datafiles.
 load data_files\deconvolve_settings.mat
-load data_files\optimized_params.mat
+load data_files\optimized_params_working.mat
 
 % Initialize some important constants.
 WAVELENGTHS = ["470","530","590","625","730","850","940"]; % Reflected light
 LIGHT_TABLE_INDICES = [1,2,4,6,7]; % In case of transmitted light
-FOCUS_INDEX = 2; % 530 nm (green)
+% FOCUS_INDEX = 2; % 530 nm (green)
 TILE_SIZE = 5; % Split images into an nxn grid when deconvolving; optimize for your own computer.
 
 % Initialize directories.
@@ -24,8 +24,8 @@ for imageNum = 1:length(WAVELENGTHS)
     blurryIndex = imageNum;
     
     % Determine deconvolve parameters.
-    optRadius = optimalRadius(FOCUS_INDEX, blurryIndex);
-    optIteration = optimalIterations(FOCUS_INDEX, blurryIndex);
+    optRadius = optimalRadii(blurryIndex);
+    optIteration = optimalIterations(blurryIndex);
     
     % Read in image.
     imageSrc = fullfile(fileList(imageNum).folder, fileList(imageNum).name);
